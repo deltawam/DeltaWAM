@@ -1,0 +1,112 @@
+# Ablation: current DINO anchors plus DeltaWorld tokens decoded to future DINO patch maps.
+# Uses v93kbzbr step-3609 DeltaWorld; raw delta tokens never enter ActionDiT; train 15k steps.
+model:
+  class_path: training.feature_conditioned_action.FeatureConditionedAction
+  init_args:
+    delta_world:
+      class_path: models.deltaworld.DeltaWorld
+      init_args:
+        max_cameras: 4
+        use_camera_embedding: true
+        tokenizer:
+          class_path: models.deltatok.DeltaTok
+          init_args:
+            ckpt_path: checkpoints/deltatok_kinetics.bin
+            backbone:
+              class_path: models.dinov3.DINOv3
+              init_args:
+                backbone_name: https://www.kaggle.com/models/x1an9l1/facebookdinov3-vitb16-pretrain-lvd1689m
+        use_task_film: true
+        task_film_text_encoder_name: google-t5/t5-base
+        task_film_text_encoder_max_length: 64
+        freeze_task_film_text_encoder: true
+        task_film_scale: 1.0
+        task_film_gated_residual: true
+        use_task_cross_attn: false
+    world_ckpt_path: checkpoints/deltaworld_libero_step3609.ckpt
+    freeze_world: true
+    num_world_samples: 8
+    oracle_branch_probability: 0.5
+    context_frames: 4
+    world_prediction_steps: 6
+    world_time_delta: 0.1
+    world_condition_mode: decoded_vfm
+    action_dim: 7
+    action_horizon: 16
+    action_hidden_dim: 768
+    action_num_layers: 12
+    action_num_heads: 12
+    action_head_dim: 64
+    action_ffn_ratio: 4
+    action_text_dim: 256
+    action_freq_dim: 256
+    action_eps: 1.0e-06
+    action_init_path: checkpoints/actiondit_wan22_init.pt
+    action_head_init: random
+    text_encoder_name: google-t5/t5-base
+    text_encoder_max_length: 64
+    freeze_text_encoder: true
+    proprio_dim: 9
+    action_history_steps: 8
+    action_history_dropout: 0.2
+    action_history_attention_mode: separate_gated
+    action_history_gate_init: 0.01
+    learning_rate: 0.0001
+    weight_decay: 0.01
+    warmup_steps: 1000
+    min_lr_ratio: 0.01
+    scheduler_num_train_timesteps: 1000
+    use_compile: false
+    scheduler_train_shift: 5.0
+    scheduler_infer_shift: 5.0
+data:
+  class_path: datasets.action_module.ActionDataModule
+  init_args:
+    frame_size: 512
+    batch_size: 32
+    val_batch_size: 16
+    num_workers: 4
+    prefetch_factor: 2
+    train_dataset_cfg:
+      class_path: datasets.libero_action.LiberoActionTrain
+      init_args:
+        suites:
+        - libero_10
+        cameras:
+        - agentview_rgb
+        - eye_in_hand_rgb
+        camera_layout: multi_view
+        context_frames: 4
+        context_frame_stride: 2
+        world_prediction_steps: 6
+        world_frame_stride: 2
+        action_horizon: 16
+        action_history_steps: 8
+        fps: 20.0
+        seed: 0
+        task_sampling: balanced
+    val_dataset_cfg:
+      class_path: datasets.libero_action.LiberoActionVal
+      init_args:
+        suites:
+        - libero_10
+        cameras:
+        - agentview_rgb
+        - eye_in_hand_rgb
+        camera_layout: multi_view
+        context_frames: 4
+        context_frame_stride: 2
+        world_prediction_steps: 6
+        world_frame_stride: 2
+        action_horizon: 16
+        action_history_steps: 8
+        fps: 20.0
+        max_samples: 128
+trainer:
+  devices: 2
+  max_steps: 20000
+  accumulate_grad_batches: 1
+  gradient_clip_val: 1.0
+  val_check_interval: 1000
+  limit_val_batches: 64
+  num_sanity_val_steps: 1

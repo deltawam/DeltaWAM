@@ -1,0 +1,122 @@
+# Full-LIBERO dual-camera DeltaWorld predictor finetune with gated residual AdaLN.
+# Keeps the original FiLM implementation available; this config explicitly enables
+# task_film_gated_residual=true and starts from checkpoints/deltaworld_kinetics.bin.
+model:
+  class_path: training.world.World
+  init_args:
+    lr: 0.0001
+    lr_warmup_steps: 1000
+    ckpt_path: checkpoints/deltaworld_kinetics.bin
+    use_compile: false
+    network:
+      class_path: models.deltaworld.DeltaWorld
+      init_args:
+        max_cameras: 4
+        use_camera_embedding: true
+        use_task_film: true
+        tokenizer:
+          class_path: models.deltatok.DeltaTok
+          init_args:
+            ckpt_path: checkpoints/deltatok_kinetics.bin
+            backbone:
+              class_path: models.dinov3.DINOv3
+              init_args:
+                backbone_name: https://www.kaggle.com/models/x1an9l1/facebookdinov3-vitb16-pretrain-lvd1689m
+        task_film_text_encoder_name: google-t5/t5-base
+        task_film_text_encoder_max_length: 64
+        freeze_task_film_text_encoder: true
+        task_film_scale: 1.0
+        task_film_gated_residual: true
+    eval_horizons:
+    - 1
+    - 3
+    - 6
+data:
+  class_path: datasets.module.DataModule
+  init_args:
+    frame_size: 512
+    batch_size: 2
+    num_workers: 4
+    train_dataset_cfg:
+      class_path: datasets.libero.LiberoTrain
+      init_args:
+        num_frames: 10
+        suites:
+        - libero_spatial
+        - libero_object
+        - libero_goal
+        - libero_90
+        - libero_10
+        cameras:
+        - agentview_rgb
+        - eye_in_hand_rgb
+        camera_layout: multi_view
+        horizontal_flip: false
+        scale:
+        - 0.8
+        - 1.0
+        suite_sampling: balanced
+    val_datasets_cfg:
+      libero_spatial:
+        class_path: datasets.libero.LiberoVal
+        init_args:
+          num_frames: 10
+          suites:
+          - libero_spatial
+          cameras:
+          - agentview_rgb
+          - eye_in_hand_rgb
+          camera_layout: multi_view
+          max_samples: 128
+      libero_object:
+        class_path: datasets.libero.LiberoVal
+        init_args:
+          num_frames: 10
+          suites:
+          - libero_object
+          cameras:
+          - agentview_rgb
+          - eye_in_hand_rgb
+          camera_layout: multi_view
+          max_samples: 128
+      libero_goal:
+        class_path: datasets.libero.LiberoVal
+        init_args:
+          num_frames: 10
+          suites:
+          - libero_goal
+          cameras:
+          - agentview_rgb
+          - eye_in_hand_rgb
+          camera_layout: multi_view
+          max_samples: 128
+      libero_90:
+        class_path: datasets.libero.LiberoVal
+        init_args:
+          num_frames: 10
+          suites:
+          - libero_90
+          cameras:
+          - agentview_rgb
+          - eye_in_hand_rgb
+          camera_layout: multi_view
+          max_samples: 128
+      libero_10:
+        class_path: datasets.libero.LiberoVal
+        init_args:
+          num_frames: 10
+          suites:
+          - libero_10
+          cameras:
+          - agentview_rgb
+          - eye_in_hand_rgb
+          camera_layout: multi_view
+          max_samples: 128
+trainer:
+  devices: 2
+  accumulate_grad_batches: 32
+  gradient_clip_val: 0.5
+  limit_val_batches: 64
+  num_sanity_val_steps: 1
+  val_check_interval: 1000
+  max_steps: 50000
