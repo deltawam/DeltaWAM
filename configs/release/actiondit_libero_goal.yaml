@@ -23,7 +23,7 @@ model:
         task_film_scale: 1.0
         task_film_gated_residual: true
         use_task_cross_attn: false
-    world_ckpt_path: checkpoints/deltaworld_libero_step3609.ckpt
+    world_ckpt_path: checkpoints/deltaworld/deltaworld_finetuned_2.ckpt
     freeze_world: true
     num_world_samples: 8
     oracle_branch_probability: 0.5
@@ -50,7 +50,7 @@ model:
     action_history_dropout: 0.2
     action_history_attention_mode: separate_gated
     action_history_gate_init: 0.01
-    action_warmstart_path: checkpoints/actiondit_libero90_step28737.ckpt
+    action_warmstart_path: checkpoints/actiondit/actiondit_libero90_pretrained.ckpt
     learning_rate: 5.0e-05
     weight_decay: 0.01
     warmup_steps: 500

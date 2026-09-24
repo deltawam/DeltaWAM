@@ -1,7 +1,5 @@
-# Frozen snapshot of the configuration that produced fobtm1lu, with exactly
-# one intended model change: use the full-LIBERO gated-AdaLN DeltaWorld at
-# step 3125. Launch with the APS checkpoint via --ckpt_path for a full-state
-# resume from global step 28737 to 33737 (5000 additional optimizer steps).
+# LIBERO-Spatial specialization from the pretrained LIBERO-90 ActionDiT.
+# Uses deltaworld_finetuned_1.ckpt and resumes the full optimizer state.
 model:
   class_path: training.feature_conditioned_action.FeatureConditionedAction
   init_args:
@@ -25,7 +23,7 @@ model:
         task_film_scale: 1.0
         task_film_gated_residual: true
         use_task_cross_attn: false
-    world_ckpt_path: checkpoints/deltaworld_libero_step3125.ckpt
+    world_ckpt_path: checkpoints/deltaworld/deltaworld_finetuned_1.ckpt
     freeze_world: true
     num_world_samples: 8
     oracle_branch_probability: 0.5
@@ -52,7 +50,7 @@ model:
     action_history_dropout: 0.2
     action_history_attention_mode: separate_gated
     action_history_gate_init: 0.01
-    action_warmstart_path: checkpoints/actiondit_libero90_step28737.ckpt
+    action_warmstart_path: checkpoints/actiondit/actiondit_libero90_pretrained.ckpt
     learning_rate: 5.0e-05
     weight_decay: 0.01
     warmup_steps: 500

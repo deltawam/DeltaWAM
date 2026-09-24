@@ -50,29 +50,45 @@ the hosting service. T5-Base is downloaded through Transformers.
 
 ## Checkpoints
 
-Weights are released separately on Hugging Face and intentionally excluded
-from Git. Place the artifacts under `checkpoints/` with this layout:
+Released checkpoints are hosted in the
+[DeltaWAM Hugging Face repository](https://huggingface.co/deltawam/DeltaWAM)
+and intentionally excluded from Git.
+
+Download all released checkpoints directly into the expected local layout:
+
+```bash
+hf download deltawam/DeltaWAM \
+  --include "actiondit/*" \
+  --include "deltaworld/*" \
+  --local-dir checkpoints
+```
+
+The complete expected directory layout is:
 
 ```text
 checkpoints/
-├── deltatok_kinetics.bin
-├── deltaworld_kinetics.bin
-├── deltaworld_libero_step3125.ckpt
-├── deltaworld_libero_step3609.ckpt
-├── actiondit_wan22_init.pt
-├── actiondit_libero90_step28737.ckpt
-├── actiondit_libero90_l10_warmstart.ckpt
-├── actiondit_libero_spatial.ckpt
-├── actiondit_libero_object.ckpt
-├── actiondit_libero_goal.ckpt
-└── actiondit_libero_10.ckpt
+├── actiondit/
+│   ├── actiondit_libero90_pretrained.ckpt
+│   ├── actiondit_libero_spatial.ckpt
+│   ├── actiondit_libero_object.ckpt
+│   ├── actiondit_libero_goal.ckpt
+│   └── actiondit_libero_10.ckpt
+├── deltaworld/
+│   ├── deltaworld_finetuned_1.ckpt
+│   └── deltaworld_finetuned_2.ckpt
+├── deltatok_kinetics.bin          # prepare separately
+├── deltaworld_kinetics.bin        # prepare separately
+└── actiondit_wan22_init.pt        # prepare separately
 ```
 
-The step-3,125 DeltaWorld checkpoint is used by the released Spatial policy;
-the other standard suites use step 3,609. Spatial, Object, and Goal
-specialization resume the full LIBERO-90 state at step 28,737. LIBERO-10 uses
-a weights-only warm start. Add SHA256 hashes and Hugging Face revision
-identifiers when the model release is finalized.
+The seven files under `actiondit/` and `deltaworld/` are provided by the
+Hugging Face repository. The three initialization assets at the root of
+`checkpoints/` are not included and must be prepared separately when needed.
+
+`deltaworld_finetuned_1.ckpt` is used by the released Spatial policy;
+`deltaworld_finetuned_2.ckpt` is used by the other released policies.
+Spatial, Object, and Goal use full-state specialization from the LIBERO-90
+checkpoint. LIBERO-10 uses the same checkpoint as a weights-only warm start.
 
 ## LIBERO data
 
@@ -163,10 +179,10 @@ Spatial, Object, and Goal use full-state resume:
 
 ```bash
 python main.py fit -c configs/release/actiondit_libero_object.yaml \
-  --ckpt_path checkpoints/actiondit_libero90_step28737.ckpt
+  --ckpt_path checkpoints/actiondit/actiondit_libero90_pretrained.ckpt
 ```
 
-LIBERO-10 loads `actiondit_libero90_l10_warmstart.ckpt` through
+LIBERO-10 loads `actiondit/actiondit_libero90_pretrained.ckpt` through
 `action_warmstart_path` and starts a new optimizer schedule.
 
 ## Inference and evaluation

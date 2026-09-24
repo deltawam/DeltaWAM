@@ -10,7 +10,7 @@ case "${suite}" in
     config="configs/release/actiondit_libero_${suite}.yaml"
     exec "${python_bin}" main.py fit \
       -c "${config}" \
-      --ckpt_path checkpoints/actiondit_libero90_step28737.ckpt \
+      --ckpt_path checkpoints/actiondit/actiondit_libero90_pretrained.ckpt \
       "$@"
     ;;
   libero_10)

@@ -9,12 +9,12 @@ case "${suite}" in
   spatial|object|goal)
     benchmark_suite="libero_${suite}"
     config="configs/release/actiondit_libero_${suite}.yaml"
-    checkpoint="checkpoints/actiondit_libero_${suite}.ckpt"
+    checkpoint="checkpoints/actiondit/actiondit_libero_${suite}.ckpt"
     ;;
   libero_10)
     benchmark_suite="libero_10"
     config="configs/release/actiondit_libero_10.yaml"
-    checkpoint="checkpoints/actiondit_libero_10.ckpt"
+    checkpoint="checkpoints/actiondit/actiondit_libero_10.ckpt"
     ;;
   *)
     echo "unsupported suite: ${suite}" >&2

@@ -23,7 +23,7 @@ model:
         task_film_scale: 1.0
         task_film_gated_residual: true
         use_task_cross_attn: false
-    world_ckpt_path: checkpoints/deltaworld_libero_step3609.ckpt
+    world_ckpt_path: checkpoints/deltaworld/deltaworld_finetuned_2.ckpt
     freeze_world: true
     num_world_samples: 8
     oracle_branch_probability: 0.5
