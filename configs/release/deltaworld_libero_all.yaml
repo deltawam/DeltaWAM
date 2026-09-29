@@ -35,7 +35,7 @@ data:
   class_path: datasets.module.DataModule
   init_args:
     frame_size: 512
-    batch_size: 2
+    batch_size: 32
     num_workers: 4
     train_dataset_cfg:
       class_path: datasets.libero.LiberoTrain
@@ -119,7 +119,7 @@ data:
           max_samples: 128
 trainer:
   devices: 2
-  accumulate_grad_batches: 32
+  accumulate_grad_batches: 2
   gradient_clip_val: 0.5
   limit_val_batches: 64
   num_sanity_val_steps: 1

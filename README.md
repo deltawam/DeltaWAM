@@ -94,10 +94,11 @@ ${LIBERO_ROOT}/
 └── libero_10/*.hdf5
 ```
 
-Each standard task starts with 50 demonstrations. Suite specialization uses
-the replay-verified demonstration lists under `splits/`. The lists contain
-only relative HDF5 names and demonstration identifiers and do not redistribute
-LIBERO data.
+Each standard task starts with 50 demonstrations. DeltaWorld training uses the
+replay-verified demonstration lists under `splits/` for Spatial, Object, Goal,
+and LIBERO-10 (the long-horizon suite); LIBERO-90 remains unfiltered. Suite
+specialization uses the same verified lists. The lists contain only relative
+HDF5 names and demonstration identifiers and do not redistribute LIBERO data.
 
 To regenerate a list from a local LIBERO installation, use:
 
