@@ -1,4 +1,4 @@
-# Local 2-GPU LIBERO-Object specialization from APS LIBERO-90 checkpoint.
+# LIBERO-Object specialization from the LIBERO-90 checkpoint.
 # Full resume: step 28737 -> 33737, global batch = 2 GPUs * 32 * 1 = 64.
 model:
   class_path: training.feature_conditioned_action.FeatureConditionedAction

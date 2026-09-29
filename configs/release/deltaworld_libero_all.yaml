@@ -55,6 +55,11 @@ data:
         scale:
         - 0.8
         - 1.0
+        expert_demo_whitelist_paths:
+          libero_spatial: splits/libero_spatial_verified.json
+          libero_object: splits/libero_object_verified.json
+          libero_goal: splits/libero_goal_verified.json
+          libero_10: splits/libero_10_verified.json
         suite_sampling: balanced
     val_datasets_cfg:
       libero_spatial:

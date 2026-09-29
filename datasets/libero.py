@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,8 @@ from datasets.base import (
     compute_resize_sizes,
     sample_frame_indices,
 )
+
+LOGGER = logging.getLogger(__name__)
 
 
 class LiberoMixin:
@@ -169,6 +172,7 @@ class LiberoTrain(LiberoMixin, TrainDataset):
         ratio_jitter: float = 4 / 3,
         scale: tuple[float, float] = (0.8, 1.0),
         suite_sampling: str = "proportional",
+        expert_demo_whitelist_paths: dict[str, str] | None = None,
     ):
         super().__init__(
             root=root,
@@ -186,6 +190,39 @@ class LiberoTrain(LiberoMixin, TrainDataset):
         self._validate_camera_args()
         self.root = self._resolve_root(root)
         self.samples = self._load_demo_samples(self.root, self.suites)
+        whitelist_paths = dict(expert_demo_whitelist_paths or {})
+        unknown_suites = sorted(set(whitelist_paths) - set(self.suites))
+        if unknown_suites:
+            raise ValueError(
+                "Expert demo whitelists were provided for suites that are not "
+                f"being loaded: {unknown_suites}"
+            )
+        if whitelist_paths:
+            unfiltered_samples = self.samples
+            samples_by_suite = self._group_samples_by_suite(
+                unfiltered_samples, self.suites
+            )
+            filtered_by_suite: dict[str, list[tuple[str, str]]] = {}
+            for suite in self.suites:
+                suite_samples = samples_by_suite[suite]
+                whitelist_path = whitelist_paths.get(suite)
+                filtered_by_suite[suite] = self._filter_demo_samples_by_whitelist(
+                    suite_samples, self.root, whitelist_path
+                )
+                if whitelist_path is not None:
+                    LOGGER.info(
+                        "Strict replay whitelist retained %d/%d LIBERO demos "
+                        "for suite=%s from %s",
+                        len(filtered_by_suite[suite]),
+                        len(suite_samples),
+                        suite,
+                        whitelist_path,
+                    )
+            self.samples = [
+                sample
+                for suite in self.suites
+                for sample in filtered_by_suite[suite]
+            ]
         self.suite_sampling = str(suite_sampling)
         if self.suite_sampling not in {"proportional", "balanced"}:
             raise ValueError(
@@ -301,4 +338,3 @@ class LiberoVal(LiberoMixin, ValDataset):
             None,
             idx,
         )
-

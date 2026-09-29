@@ -50,18 +50,9 @@ the hosting service. T5-Base is downloaded through Transformers.
 
 ## Checkpoints
 
-Released checkpoints are hosted in the
-[DeltaWAM Hugging Face repository](https://huggingface.co/deltawam/DeltaWAM)
-and intentionally excluded from Git.
-
-Download all released checkpoints directly into the expected local layout:
-
-```bash
-hf download deltawam/DeltaWAM \
-  --include "actiondit/*" \
-  --include "deltaworld/*" \
-  --local-dir checkpoints
-```
+Checkpoint files are intentionally excluded from this anonymous supplementary
+archive. Place separately obtained checkpoints in the expected local layout
+below before running training or evaluation commands that require them.
 
 The complete expected directory layout is:
 
@@ -81,9 +72,9 @@ checkpoints/
 └── actiondit_wan22_init.pt        # prepare separately
 ```
 
-The seven files under `actiondit/` and `deltaworld/` are provided by the
-Hugging Face repository. The three initialization assets at the root of
-`checkpoints/` are not included and must be prepared separately when needed.
+The checkpoint files under `actiondit/` and `deltaworld/` are not bundled. The
+three initialization assets at the root of `checkpoints/` must also be prepared
+separately when needed.
 
 `deltaworld_finetuned_1.ckpt` is used by the released Spatial policy;
 `deltaworld_finetuned_2.ckpt` is used by the other released policies.
